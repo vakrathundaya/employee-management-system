@@ -685,3 +685,18 @@ function removeRole() {
     });
 
 }
+// Total utilized budget by department
+function totalBudgetDepartment() {
+    let query = "SELECT name department, SUM(salary) salaries FROM ( ";
+    query += "SELECT role_id, COUNT(*) ";
+    query += "FROM employee  ";
+    query += "GROUP BY role_id ";
+    query += ") AS roleCount JOIN role ON role.id = roleCount.role_id ";
+    query += "LEFT JOIN department d ON department_id = d.id ";
+    query += "GROUP BY department_id";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.table(res)
+        initMenu();
+    })
+}
