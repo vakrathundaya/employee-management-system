@@ -195,3 +195,27 @@ function queryEmployees(type, filter) {
     });
 
 }
+
+// Get Employee by Manager
+function employeeByManager() {
+
+    let query = "SELECT DISTINCT CONCAT_WS(' ', e2.first_name, e2.last_name) manager FROM employee e ";
+    query += "INNER JOIN employee e2 ON e.manager_id = e2.id ";
+    query += "ORDER BY e.id ASC";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        // Get managers asynchronously 
+        getManagers(res).then(result => {
+            inquirer
+                .prompt({
+                    name: "selManager",
+                    type: "list",
+                    message: "Selected a manager to filter by:",
+                    choices: result
+                }).then(response => {
+                    queryEmployees("manager", response.selManager);
+                });
+        });
+    });
+
+}
