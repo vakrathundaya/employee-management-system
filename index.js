@@ -219,3 +219,26 @@ function employeeByManager() {
     });
 
 }
+
+// Get Employee by Department
+function employeeByDepartment() {
+
+    let query = "SELECT name FROM department ";
+    query += "ORDER BY id ASC";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        // Get departments asynchronously 
+        getDepartments(res).then(result => {
+            inquirer
+                .prompt({
+                    name: "selDepartment",
+                    type: "list",
+                    message: "Selected a department to filter by:",
+                    choices: result
+                }).then(response => {
+                    queryEmployees("department", response.selDepartment);
+                });
+        });
+    });
+
+}
