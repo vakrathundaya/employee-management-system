@@ -16,8 +16,8 @@ Tasks completed
 ---------------
 
 
-* WHEN user start the application then Menu displayed with following options
-view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
+* When user start the application then Menu displayed with following options
+ view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
 * view all departments displays formatted table showing department names and department ids
 * view all roles displays job title, role id, the department that role belongs to, and the salary for that role
 * view all employees displays formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
@@ -33,12 +33,12 @@ Links
 
 Link to the Repo
 
-
+https://github.com/vakrathundaya/employee-management-system
 
 Link to the deployed Application
 --------------------------------
 
-
+https://vakrathundaya.github.io/employee-management-system/
 
 # Installation
 
