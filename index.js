@@ -79,10 +79,10 @@ function addAnother(returnTo) {
 
 // Start Application
 function init() {
-   
+
     console.log("---------------------   WELCOME TO EMPLOYEE TRACKER   ------------------------");
     console.log(" ");
- 
+
     initMenu();
 };
 
@@ -369,6 +369,127 @@ function removeEmployee() {
                                     initMenu();
                                 }
                             });
+                    }
+                });
+        });
+    });
+
+}
+// Update Employee
+function updateEmployee(type) {
+
+    let query = "SELECT id, CONCAT_WS(' ', first_name, last_name) name FROM employee ";
+    query += "ORDER BY id ASC";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        getEmployees(res).then(result => {
+            result.push(new inquirer.Separator(), "Cancel", new inquirer.Separator());
+            inquirer
+                .prompt([
+                    {
+                        type: "list",
+                        message: "Select employee to update title of:",
+                        name: "selEmployee",
+                        choices: result
+                    }
+                ]).then(response => {
+                    if (response.selEmployee === "Cancel") {
+                        initMenu();
+                    } else {
+
+                        // Update Title
+                        if (type === "title") {
+                            let query = "SELECT id, title FROM role ";
+                            query += "ORDER BY id ASC";
+                            connection.query(query, (err, res2) => {
+                                if (err) throw err;
+                                // Get roles asynchronously 
+                                getRoles(res2).then(result2 => {
+                                    inquirer
+                                        .prompt([
+                                            {
+                                                type: "list",
+                                                message: "Select employee title:",
+                                                name: "selRole",
+                                                choices: result2
+                                            }
+                                        ]).then(response2 => {
+
+                                            connection.query(
+                                                "UPDATE employee SET ? WHERE ?",
+                                                [
+                                                    {
+                                                        // set to
+                                                        role_id: res2[result2.indexOf(response2.selRole)].id
+                                                    },
+                                                    {
+                                                        // select
+                                                        id: res[result.indexOf(response.selEmployee)].id
+                                                    }
+                                                ],
+                                                function (err, res) {
+                                                    if (err) throw err;
+                                                    console.log(`${response.selEmployee}'s title has been updated.`);
+                                                    initMenu();
+                                                }
+                                            );
+                                        });
+
+                                });
+                            });
+                        }
+
+                        // Update Manager
+                        if (type === "manager") {
+                            let query = "SELECT id, CONCAT_WS(' ', first_name, last_name) name FROM employee ";
+                            query += "ORDER BY id ASC";
+                            connection.query(query, (err, res2) => {
+                                if (err) throw err;
+                                getEmployees(res2).then(result2 => {
+                                    result2.push(new inquirer.Separator(), "Null", new inquirer.Separator());
+                                    inquirer
+                                        .prompt([
+                                            {
+                                                type: "list",
+                                                message: "Select employee manager:",
+                                                name: "selManager",
+                                                choices: result2
+                                            }
+                                        ]).then(response2 => {
+                                            let updateQuery = "";
+                                            let updateInputs = [];
+                                            if (response2.selManager === "Null") {
+                                                updateQuery = "UPDATE employee SET manager_id = NULL WHERE ?";
+                                                updateInputs = [
+                                                    {
+                                                        id: res[result.indexOf(response.selEmployee)].id
+                                                    }
+                                                ];
+                                            } else {
+                                                updateQuery = "UPDATE employee SET ? WHERE ?";
+                                                updateInputs = [
+                                                    {
+                                                        manager_id: res2[result2.indexOf(response2.selManager)].id
+                                                    },
+                                                    {
+                                                        id: res[result.indexOf(response.selEmployee)].id
+                                                    }
+                                                ]
+                                            }
+
+                                            connection.query(
+                                                updateQuery,
+                                                updateInputs,
+                                                function (err, res) {
+                                                    if (err) throw err;
+                                                    console.log(`${response.selEmployee}'s manager has been updated.`);
+                                                    initMenu();
+                                                }
+                                            );
+                                        });
+                                });
+                            });
+                        }
                     }
                 });
         });
