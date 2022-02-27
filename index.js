@@ -44,3 +44,34 @@ async function getRoles(array) {
     }
     return roles;
 }
+//Get Employees
+async function getEmployees(array) {
+    let employeesArray = [];
+    for (let i = 0; i < array.length; i++) {
+        await employeesArray.push(`${array[i].name}`);
+    }
+    return employeesArray;
+}
+
+// Add Another?
+function addAnother(returnTo) {
+    inquirer
+        .prompt({
+            name: "addAnother",
+            type: "list",
+            message: "Add another?",
+            choices: ["no", "yes"]
+        }).then(response => {
+            if (response.addAnother === "yes") {
+                if (returnTo === "addEmployee") {
+                    addEmployee();
+                } else if (returnTo === "addDepartment") {
+                    addDepartment();
+                } else if (returnTo === "addRole") {
+                    addRole();
+                }
+            } else {
+                initMenu();
+            }
+        });
+}
