@@ -27,3 +27,20 @@ async function getManagers(array) {
     }
     return managers;
 }
+//Get Departments
+async function getDepartments(array) {
+    let departments = [];
+    for (let i = 0; i < array.length; i++) {
+        await departments.push(array[i].name);
+    }
+    return departments;
+}
+
+// Get Role
+async function getRoles(array) {
+    let roles = [];
+    for (let i = 0; i < array.length; i++) {
+        await roles.push(array[i].title);
+    }
+    return roles;
+}
