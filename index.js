@@ -242,3 +242,83 @@ function employeeByDepartment() {
     });
 
 }
+
+// Add Employee
+function addEmployee() {
+
+    let query = "SELECT title FROM role ";
+    query += "ORDER BY id ASC";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        // Get roles asynchronously 
+        getRoles(res).then(result => {
+            inquirer
+                .prompt([
+                    {
+                        type: "input",
+                        message: "Enter employee first name:",
+                        name: "firstName"
+                    },
+                    {
+                        type: "input",
+                        message: "Enter employee last name:",
+                        name: "lastName"
+                    },
+                    {
+                        type: "list",
+                        message: "Select employee title:",
+                        name: "selRole",
+                        choices: result
+                    }
+                ]).then(response => {
+                    if (response.firstName === "" || response.lastName === "") {
+                        console.log("No employee added. Field(s) were blank.")
+                        return initMenu();
+                    }
+                    let query = "SELECT id, CONCAT_WS(' ', first_name, last_name) name FROM employee ";
+                    query += "ORDER BY id ASC";
+                    connection.query(query, (err, res) => {
+                        if (err) throw err;
+                        getEmployees(res).then(result2 => {
+                            result2.push(new inquirer.Separator(), "Null", new inquirer.Separator());
+                            inquirer
+                                .prompt([
+                                    {
+                                        type: "list",
+                                        message: "Select employee manager:",
+                                        name: "selManager",
+                                        choices: result2
+                                    }
+                                ]).then(response2 => {
+
+                                    let newEmployee = {};
+                                    if (response2.selManager === "Null") {
+                                        newEmployee = {
+                                            first_name: response.firstName,
+                                            last_name: response.lastName,
+                                            role_id: res[result.indexOf(response.selRole)].id
+                                        }
+                                    } else {
+                                        newEmployee = {
+                                            first_name: response.firstName,
+                                            last_name: response.lastName,
+                                            role_id: res[result.indexOf(response.selRole)].id,
+                                            manager_id: res[result2.indexOf(response2.selManager)].id
+                                        }
+                                    }
+
+                                    connection.query("INSERT INTO employee SET ?",
+                                        newEmployee,
+                                        (err, res) => {
+                                            if (err) throw err;
+                                            console.log(`${newEmployee.first_name} ${newEmployee.last_name} has been added.`);
+                                            addAnother("addEmployee");
+                                        });
+                                });
+                        });
+                    });
+                });
+        });
+    });
+
+}
