@@ -166,3 +166,32 @@ function initMenu() {
         });
 
 }
+
+// Query Employees
+function queryEmployees(type, filter) {
+
+    let query = "SELECT e.id, e.first_name, e.last_name, title, name, salary, CONCAT_WS(' ', e2.first_name, e2.last_name) manager FROM employee e ";
+    query += "LEFT JOIN role ";
+    query += "ON role_id = role.id ";
+    query += "LEFT JOIN department ";
+    query += "ON role.department_id = department.id ";
+    query += "LEFT JOIN employee e2 ON e.manager_id = e2.id ";
+    if (type === "manager") {
+        query += "WHERE CONCAT_WS(' ', e2.first_name, e2.last_name) = ? ";
+    }
+    else if (type === "department") {
+        query += "WHERE name = ? ";
+    }
+    query += "ORDER BY e.id ASC";
+    connection.query(query, [filter], (err, res) => {
+        if (err) throw err;
+        let employeeArray = [];
+        res.forEach(employee => {
+            const newEmployee = new Employee(employee.id, employee.first_name, employee.last_name, employee.title, employee.name, employee.salary, employee.manager);
+            employeeArray.push(newEmployee);
+        });
+        console.table(employeeArray);
+        initMenu();
+    });
+
+}
