@@ -496,3 +496,85 @@ function updateEmployee(type) {
     });
 
 }
+// View All Departments
+function viewDepartments() {
+    let query = "SELECT id, name FROM department ";
+    query += "ORDER BY id ASC";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        departmentArray = [];
+        res.forEach(department => {
+            departmentArray.push({ id: department.id, department: department.name })
+        })
+        console.table(departmentArray);
+        initMenu();
+    });
+}
+
+// Add Department
+function addDepartment() {
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                message: "Enter name for new department:",
+                name: "depName"
+            }
+        ]).then(response => {
+            if (response.depName == "") {
+                console.log("No department added. Name was blank.")
+                return initMenu();
+            }
+            connection.query("INSERT INTO department SET ?",
+                [{ name: response.depName }],
+                (err, res) => {
+                    if (err) throw err;
+                    console.log(`${response.depName} department has been added.`);
+                    addAnother("addDepartment");
+                });
+        });
+}
+
+// Remove Department
+function removeDepartment() {
+    let query = "SELECT id, name FROM department ";
+    query += "ORDER BY id ASC";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        getDepartments(res).then(result => {
+            inquirer
+                .prompt({
+                    name: "selDepartment",
+                    type: "list",
+                    message: "Selected a department to remove:",
+                    choices: result
+                }).then(response => {
+                    inquirer
+                        .prompt([
+                            {
+                                type: "list",
+                                message: `Are you sure you want to remove ${response.selDepartment}?`,
+                                name: "areYouSure",
+                                choices: ["yes", "no"]
+                            }
+                        ]).then(response2 => {
+                            if (response2.areYouSure === "yes") {
+                                let departmentId = res[result.indexOf(response.selDepartment)].id;
+                                connection.query("DELETE FROM department WHERE ?",
+                                    {
+                                        id: departmentId
+                                    },
+                                    (err, res) => {
+                                        if (err) throw err;
+                                        console.log(`${response.selDepartment} department has been removed.`);
+                                        initMenu();
+                                    }
+                                );
+                            } else {
+                                initMenu();
+                            }
+                        })
+                });
+        });
+    });
+}
