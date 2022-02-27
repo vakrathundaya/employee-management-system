@@ -322,3 +322,56 @@ function addEmployee() {
     });
 
 }
+// Remove Employee
+function removeEmployee() {
+
+    let query = "SELECT id, CONCAT_WS(' ', first_name, last_name) name FROM employee ";
+    query += "ORDER BY id ASC";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        getEmployees(res).then(result => {
+            result.push(new inquirer.Separator(), "Cancel", new inquirer.Separator());
+            inquirer
+                .prompt([
+                    {
+                        type: "list",
+                        message: "Select employee to remove:",
+                        name: "selEmployee",
+                        choices: result
+                    }
+                ]).then(response => {
+                    if (response.selEmployee === "Cancel") {
+                        initMenu();
+                    } else {
+                        inquirer
+                            .prompt([
+                                {
+                                    type: "list",
+                                    message: `Are you sure you want to remove ${response.selEmployee}?`,
+                                    name: "areYouSure",
+                                    choices: ["yes", "no"]
+                                }
+                            ]).then(response2 => {
+                                if (response2.areYouSure === "yes") {
+                                    let employeeId = res[result.indexOf(response.selEmployee)].id;
+                                    //console.log(employeeId);
+                                    connection.query("DELETE FROM employee WHERE ?",
+                                        {
+                                            id: employeeId
+                                        },
+                                        (err, res) => {
+                                            if (err) throw err;
+                                            console.log(`${response.selEmployee} employee has been removed.`);
+                                            initMenu();
+                                        }
+                                    );
+                                } else {
+                                    initMenu();
+                                }
+                            });
+                    }
+                });
+        });
+    });
+
+}
