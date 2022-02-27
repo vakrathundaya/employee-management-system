@@ -75,3 +75,94 @@ function addAnother(returnTo) {
             }
         });
 }
+
+
+// Start Application
+function init() {
+   
+    console.log("---------------------   WELCOME TO EMPLOYEE TRACKER   ------------------------");
+    console.log(" ");
+ 
+    initMenu();
+};
+
+// Main menu
+function initMenu() {
+    inquirer
+        .prompt({
+            name: "initMenu",
+            type: "list",
+            message: "What would you like to do?",
+            choices: [
+                "View All Employees",
+                "View All Employees By Department",
+                "View All Employees By Manager",
+                "Add Employee",
+                "Remove Employee",
+                "Update Employee Title",
+                "Update Employee Manager",
+                new inquirer.Separator(),
+                "View All Departments",
+                "Add Department",
+                "Remove Department",
+                new inquirer.Separator(),
+                "View All Roles",
+                "Add Role",
+                "Remove Role",
+                new inquirer.Separator(),
+                "Total Utilized Budget By Department",
+                new inquirer.Separator(),
+                "Exit",
+                new inquirer.Separator()
+            ]
+        }).then(response => {
+            switch (response.initMenu) {
+
+                case "View All Employees":
+                    return queryEmployees("", "");
+
+                case "View All Employees By Department":
+                    return employeeByDepartment();
+
+                case "View All Employees By Manager":
+                    return employeeByManager();
+
+                case "Add Employee":
+                    return addEmployee();
+
+                case "Remove Employee":
+                    return removeEmployee();
+
+                case "Update Employee Title":
+                    return updateEmployee("title");
+
+                case "Update Employee Manager":
+                    return updateEmployee("manager");
+
+                case "View All Departments":
+                    return viewDepartments();
+
+                case "Add Department":
+                    return addDepartment();
+
+                case "Remove Department":
+                    return removeDepartment();
+
+                case "View All Roles":
+                    return viewRoles();
+
+                case "Add Role":
+                    return addRole();
+
+                case "Remove Role":
+                    return removeRole();
+
+                case "Total Utilized Budget By Department":
+                    return totalBudgetDepartment();
+
+                case "Exit":
+                    return connection.end();
+            }
+        });
+
+}
