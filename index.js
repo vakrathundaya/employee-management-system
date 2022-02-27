@@ -578,3 +578,110 @@ function removeDepartment() {
         });
     });
 }
+
+// View All Roles
+function viewRoles() {
+    let query = "SELECT r.id, r.title, r.salary, d.name FROM role r ";
+    query += "LEFT JOIN department d ON r.department_id = d.id ";
+    query += "ORDER BY r.id ASC";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        roleArray = [];
+        res.forEach(role => {
+            roleArray.push({ id: role.id, title: role.title, salary: role.salary, department: role.name })
+        });
+        console.table(roleArray);
+        initMenu();
+    });
+}
+
+// Add Role
+function addRole() {
+    let query = "SELECT id, name FROM department ";
+    query += "ORDER BY id ASC";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        getDepartments(res).then(result => {
+            inquirer
+                .prompt({
+                    name: "selDepartment",
+                    type: "list",
+                    message: "Selected a department to add a new role too:",
+                    choices: result
+                }).then(response => {
+                    let departmentId = res[result.indexOf(response.selDepartment)].id;
+                    inquirer
+                        .prompt([
+                            {
+                                type: "input",
+                                message: "Enter title for new role:",
+                                name: "roleTitle"
+                            },
+                            {
+                                type: "input",
+                                message: "Enter salary for new role:",
+                                name: "roleSalary"
+                            }
+                        ]).then(response => {
+                            if (response.roleTitle == "" || response.roleSalary == "") {
+                                console.log("No role added. Field(s) were blank.")
+                                return initMenu();
+                            }
+                            connection.query("INSERT INTO role SET ?",
+                                [{ title: response.roleTitle, salary: response.roleSalary, department_id: departmentId }],
+                                (err, res) => {
+                                    if (err) throw err;
+                                    console.log(`${response.roleTitle} role has been added.`);
+                                    addAnother("addRole");
+                                });
+
+                        });
+                });
+        });
+    });
+}
+
+// Remove Role
+function removeRole() {
+    let query = "SELECT id, title FROM role ";
+    query += "ORDER BY id ASC";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        getRoles(res).then(result => {
+            inquirer
+                .prompt({
+                    name: "selRole",
+                    type: "list",
+                    message: "Selected a role to remove:",
+                    choices: result
+                }).then(response => {
+                    inquirer
+                        .prompt([
+                            {
+                                type: "list",
+                                message: `Are you sure you want to remove ${response.selRole}?`,
+                                name: "areYouSure",
+                                choices: ["yes", "no"]
+                            }
+                        ]).then(response2 => {
+                            if (response2.areYouSure === "yes") {
+                                let roleId = res[result.indexOf(response.selRole)].id;
+                                connection.query("DELETE FROM role WHERE ?",
+                                    {
+                                        id: roleId
+                                    },
+                                    (err, res) => {
+                                        if (err) throw err;
+                                        console.log(`${response.selRole} role has been removed.`);
+                                        initMenu();
+                                    }
+                                );
+                            } else {
+                                initMenu();
+                            }
+                        })
+                });
+        });
+    });
+
+}
