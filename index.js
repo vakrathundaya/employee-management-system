@@ -19,3 +19,11 @@ connection.connect(function (err) {
 });
 
 
+// Get Managers
+async function getManagers(array) {
+    let managers = [];
+    for (let i = 0; i < array.length; i++) {
+        await managers.push(array[i].manager);
+    }
+    return managers;
+}
