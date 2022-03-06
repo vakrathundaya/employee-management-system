@@ -42,4 +42,4 @@ https://vakrathundaya.github.io/employee-management-system/
 
 # Installation
 
-The user should clone the repository from GitHub and download Node.js and Express.js. User should install console.table,inquirer,mysql,dotenv.
+Make sure you install the dependencies in package.json file
